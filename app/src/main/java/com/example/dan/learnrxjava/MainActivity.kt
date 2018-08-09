@@ -17,7 +17,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
 
-        SimpleRxSingleton.simpleValues()
+//        SimpleRxSingleton.simpleValues()
+        SimpleRxSingleton.subjects()
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()

@@ -2,6 +2,8 @@ package com.example.dan.learnrxjava.helper
 
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.BehaviorSubject
 
 /**
  * Created by DAN on 8/10/2018.
@@ -25,9 +27,26 @@ object SimpleRxSingleton{
         }
 
         someInfo.accept("3")
-        someInfo.accept("7")
+        someInfo.accept("7as")
 
         //NOTE: Relays will never receive onError and onComplete Events
+    }
 
+    fun subjects(){
+        val behaviorSubject = BehaviorSubject.createDefault(24)
+
+        val disposable = behaviorSubject.subscribe({newValue -> //onNext
+            println("behaviourSubject Subscription : $newValue")
+        },{error -> //onError
+            println("onError : ${error.localizedMessage}")
+        },{ //onCompleted
+            println("onCompleted : ")
+        },{ disposable -> //onSubscribed
+            println("Subscribed")
+        })
+
+        behaviorSubject.onNext(34)
+        behaviorSubject.onNext(48)
+        behaviorSubject.onNext(48) //duplicates show as new events by default
     }
 }
