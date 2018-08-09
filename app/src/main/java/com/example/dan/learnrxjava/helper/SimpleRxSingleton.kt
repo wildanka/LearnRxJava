@@ -18,6 +18,16 @@ object SimpleRxSingleton{
         println("TES plainString : $plainString")
 
         someInfo.accept("2")
-        println("TES someInfo.value ${someInfo.value}")
+        println("TES someInfo.value ${someInfo.value} , $plainString")
+
+        someInfo.subscribe{newValue ->
+            println(" value has changed : $newValue")
+        }
+
+        someInfo.accept("3")
+        someInfo.accept("7")
+
+        //NOTE: Relays will never receive onError and onComplete Events
+
     }
 }
