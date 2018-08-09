@@ -50,10 +50,16 @@ object SimpleRxSingleton{
         behaviorSubject.onNext(48) //duplicates show as new events by default
 
         //1 onError
-        val someException = IllegalArgumentException("some trial error to learn")
-        behaviorSubject.onError(someException)
-        behaviorSubject.onNext(109) //this should be not going to show,
+//        val someException = IllegalArgumentException("some trial error to learn")
+//        behaviorSubject.onError(someException)
+//        behaviorSubject.onNext(109) //this should be not going to show,
         // because by the time it gets this onNext event, the whole subject has closed down
+
+        //2 onComplete
+        /* onComplete event can be triggered only if there is onError event triggered,
+        vice-versa if you onComplete event triggered that means onError event is not triggered*/
+        behaviorSubject.onComplete()
+        behaviorSubject.onNext(312314) //will never show
 
     }
 }
