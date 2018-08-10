@@ -1,9 +1,13 @@
 package com.example.dan.learnrxjava.helper
 
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jonbott.learningrxjava.Common.disposedBy
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
+
 
 /**
  * Created by DAN on 8/10/2018.
@@ -60,6 +64,35 @@ object SimpleRxSingleton{
         vice-versa if you onComplete event triggered that means onError event is not triggered*/
         behaviorSubject.onComplete()
         behaviorSubject.onNext(312314) //will never show
+    }
+
+    fun basicObservable (){
+        //The Observable
+        val observable = Observable.create<String>{ observer ->
+            //The lambda is called for every subscriber - by default
+            /* Be kinda careful
+            make sure you pick up the right process to be subscribed,
+            you don't wanna create 100 database entries if there is 100 different subscribers who want to know when that event is finished*/
+            println("~~ Observable logic being triggered ~~")
+
+            //Do work on a background thread *Recommended
+            launch {
+                delay(1000)
+                observer.onNext("Some Value 23")
+                observer.onComplete()
+            }
+        }
+
+        //then we call the observable via subscriber
+        observable.subscribe{ someString ->
+            println("New Value : $someString")
+        }.disposedBy(bag)
+
+        val observer = observable.subscribe{ someString ->
+            println("Another Value of Subscriber : $someString")
+        }
+
+        observer.disposedBy(bag)
 
     }
 }
