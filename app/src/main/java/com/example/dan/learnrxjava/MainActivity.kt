@@ -6,22 +6,43 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.example.dan.learnrxjava.helper.SimpleRxSingleton
+import com.example.dan.learnrxjava.model.PostingModel
+import io.reactivex.disposables.CompositeDisposable
 
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Converter
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 class MainActivity : AppCompatActivity() {
+    private val BASE_URL : String = "https://jsonplaceholder.typicode.com/";
+    private var bag = CompositeDisposable()
 
+    //region Simple Network Layer
+    interface JSONPlaceholder {
+        @GET("posts/{id}")
+        fun getPost(
+                @Path("id") String id
+        ): Call<PostingModel>
+    }
+
+    private var retrofit = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+
+    private var service = retrofit.create(JSONPlaceholder::class.java)
+    //endregion
+
+    //region Life Cycle Events
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-
-//        SimpleRxSingleton.simpleValues()
-//        SimpleRxSingleton.subjects()
-
-        SimpleRxSingleton.basicObservable()
-        SimpleRxSingleton.createObservable()
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
