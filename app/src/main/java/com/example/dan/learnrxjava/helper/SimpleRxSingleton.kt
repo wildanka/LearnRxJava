@@ -3,10 +3,12 @@ package com.example.dan.learnrxjava.helper
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jonbott.learningrxjava.Common.disposedBy
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -93,6 +95,16 @@ object SimpleRxSingleton{
         }
 
         observer.disposedBy(bag)
+    }
+
+    fun createObservable(){
+//        val observable = Observable.just(23) //normal input generic container, create observable of one events
+//        val observable = Observable.interval(300,TimeUnit.MILLISECONDS).timeInterval(AndroidSchedulers.mainThread()) //observable events using timer
+
+        //observable dengan array
+        val userId = arrayOf(1,2,3,4,5,6)
+        val observable = Observable.fromArray(*userId)
+
 
     }
 }

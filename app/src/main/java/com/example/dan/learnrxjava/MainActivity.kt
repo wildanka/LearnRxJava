@@ -19,7 +19,10 @@ class MainActivity : AppCompatActivity() {
 
 //        SimpleRxSingleton.simpleValues()
 //        SimpleRxSingleton.subjects()
+
         SimpleRxSingleton.basicObservable()
+        SimpleRxSingleton.createObservable()
+
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
