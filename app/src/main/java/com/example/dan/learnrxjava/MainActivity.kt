@@ -5,12 +5,16 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.example.dan.learnrxjava.entities.Posting
 import com.example.dan.learnrxjava.helper.SimpleRxSingleton
-import com.example.dan.learnrxjava.model.PostingModel
+import com.jonbott.learningrxjava.Common.disposedBy
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -25,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     //region Simple Network Layer
     interface JSONPlaceholder {
         @GET("posts/{id}")
-        fun getPost(@Path("id") id : String): Call<PostingModel>
+        fun getPost(@Path("id") id : String): Call<Posting>
     }
 
     private var retrofit = Retrofit.Builder()
@@ -40,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        realSingleExample()
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
@@ -67,17 +73,29 @@ class MainActivity : AppCompatActivity() {
 
     //Region RxCode
     private fun realSingleExample(){
-
+        //pada fungsi ini kita melakukan konsumsi terhadap Subscription/Observable yang telah kita buat
+//        var posting: Posting;
+        loadPostAsSingle().observeOn(AndroidSchedulers.mainThread())//whatever happened just make sure it's running on main thread
+                .subscribeOn(Schedulers.io())
+                .subscribe({ posting ->
+                    tvUserID.text = posting.userId.toString()
+                    tvPostContent.text = posting.body.toString()
+                },{error ->//error
+                    println("! an Error occured : ${ error.localizedMessage }")
+                    tvUserID.text = ""
+                    tvPostContent.text = ""
+                }).disposedBy(bag)
     }
 
-    private fun loadPostAsSingle(): Single<PostingModel>{
+    private fun loadPostAsSingle(): Single<Posting>{
+        //pada method ini kita membuat sebuah Subscription/Observable
         return Single.create{ observer ->
             //Simulate Network Delay
             Thread.sleep(2000)
             val postingId = 5
             service.getPost(postingId.toString())
-                    .enqueue(object: Callback<PostingModel?> {
-                        override fun onResponse(call: Call<PostingModel?>?, response: Response<PostingModel?>?) {
+                    .enqueue(object: Callback<Posting?> {
+                        override fun onResponse(call: Call<Posting?>?, response: Response<Posting?>?) {
                             val posting = response?.body()
 
                             if (posting != null ){
@@ -88,13 +106,19 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
-                        override fun onFailure(call: Call<PostingModel?>?, t: Throwable?) {
+                        override fun onFailure(call: Call<Posting?>?, t: Throwable?) {
                             val e = t ?: IOException("An unknown network error occured")
                             observer.onError(e)
                         }
-                        
+
                     })
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bag.clear()
+    }
+
     //endregion
 }
